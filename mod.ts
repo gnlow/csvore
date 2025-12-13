@@ -1,3 +1,3 @@
-import { Text } from "./src/make.ts"
+import { text } from "./src/make.ts"
 
-console.log(Text("hi"))
+console.log(text("hi"))
