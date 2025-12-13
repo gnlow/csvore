@@ -31,18 +31,19 @@ export class Text extends Box<string> {
     }
 }
 
-import * as z from "https://esm.sh/zod@4.1.13"
+import type { StandardSchemaV1 as S } from "https://esm.sh/@standard-schema/spec@1.0.0"
 
 export class Table<Row> extends Box<IteratorObject<Row>> {
-    zodRow<T extends z.core.$ZodShape>(f: (z_: typeof z) => z.ZodObject<T>) {
-        const schema = f(z)
+    parseRow<T extends S>(schema: T) {
         return this.map((row, i) => {
-            const res = schema.safeParse(row)
-            if (res.success) {
-                return res.data
-            } else {
-                throw new Error(`fail on row ${i}:\n${res.error}`)
+            const res = schema["~standard"].validate(row)
+            if (res instanceof Promise) {
+                throw new Error("Async validator is not implemented")
             }
+            if (res.issues) {
+                throw new Error(`fail on row ${i}:\n${res.issues}`)
+            }
+            return res.value as S.InferOutput<T>
         })
     }
     map<O>(f: (row: Row, i: number) => O) {

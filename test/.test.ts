@@ -2,6 +2,8 @@ import { bytes } from "../mod.ts"
 
 import busStopsRaw from "http://cdn.jsdelivr.net/gh/gnlow/raw/file/1db7e5d0" with { type: "bytes" }
 
+import * as z from "https://esm.sh/zod@4.1.13"
+
 const res = bytes(busStopsRaw)
     .decode("euc-kr")
     .csv()
@@ -26,7 +28,7 @@ const res = bytes(busStopsRaw)
         }
         return row
     })
-    .zodRow(z => z.object({
+    .parseRow(z.object({
         정류장번호:     z.string(),
         정류장명:       z.string(),
         위도:          z.coerce.number().min(33).max(39).optional(),
