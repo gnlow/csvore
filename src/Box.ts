@@ -13,11 +13,21 @@ export class Box<T> {
     }
 }
 
+// @deno-types="https://cdn.sheetjs.com/xlsx-0.20.3/package/types/index.d.ts"
+import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs"
+
 export class Bytes extends Box<Uint8Array<ArrayBuffer>> {
     decode(label: string) {
         return new Text(
             new TextDecoder(label).decode(this.raw)
         )
+    }
+    xlsx() {
+        const workbook = XLSX.read(this.raw, {
+            dense: true,
+        })
+        const sheet = workbook.Sheets[workbook.SheetNames[0]]
+        return new Table(XLSX.utils.sheet_to_json(sheet).values())
     }
 }
 
