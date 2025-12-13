@@ -3,6 +3,14 @@ export class Box<T> {
     constructor(raw: T) {
         this.raw = raw
     }
+
+    pipe<O>(f: (raw: T) => O) {
+        return new Box(f(this.raw))
+    }
+    pass(f: (raw: T) => void) {
+        f(this.raw)
+        return this
+    }
 }
 
 export class Bytes extends Box<Uint8Array<ArrayBuffer>> {
