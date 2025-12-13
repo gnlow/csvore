@@ -39,6 +39,5 @@ const res = bytes(busStopsRaw)
         도시명:        z.string(),
         관리도시명:     z.string(),
     }))
-    .pass(x => console.log(x.toArray()))
 
 console.log(res.raw.toArray().length)
