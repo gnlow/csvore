@@ -1,3 +1,2 @@
-import { text } from "./src/make.ts"
-
-console.log(text("hi"))
+export type * from "./src/Box.ts"
+export * from "./src/make.ts"
