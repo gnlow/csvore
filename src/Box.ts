@@ -20,15 +20,32 @@ export class Text extends Box<string> {
         return new Table(
             parse(this.raw, {
                 skipFirstRow: true,
-            })
+            }).values().map(x =>
+                Object.fromEntries(
+                    Object.entries(x).map(([k, v]) =>
+                        [k, v == "" ? undefined : v]
+                    )
+                )
+            )
         )
     }
 }
 
 import * as z from "https://esm.sh/zod@4.1.13"
 
-export class Table<Row> extends Box<Iterable<Row>> {
+export class Table<Row> extends Box<IteratorObject<Row>> {
     zodRow<T extends z.core.$ZodShape>(f: (z_: typeof z) => z.ZodObject<T>) {
-        return new Table(z.array(f(z)).parse(this.raw))
+        const schema = f(z)
+        return this.map((row, i) => {
+            const res = schema.safeParse(row)
+            if (res.success) {
+                return res.data
+            } else {
+                throw new Error(`fail on row ${i}:\n${res.error}`)
+            }
+        })
+    }
+    map<O>(f: (row: Row, i: number) => O) {
+        return new Table(this.raw.map(f))
     }
 }
