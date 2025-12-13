@@ -1,6 +1,6 @@
 import { bytes } from "../mod.ts"
 
-import busLinesRaw from "http://cdn.jsdelivr.net/gh/gnlow/raw/file/e4d3b5d2" with { type: "bytes" }
+import busLinesRaw from "https://cdn.jsdelivr.net/gh/gnlow/raw/file/e4d3b5d2" with { type: "bytes" }
 
 import * as z from "https://esm.sh/zod@4.1.13"
 
