@@ -47,6 +47,30 @@ export class StreamBox<T> extends Box<AsyncIterable<T>> {
             await f(chunk)
         }
     }
+
+    decode(this: StreamBox<Uint8Array<ArrayBuffer>>, label: string) {
+        return new StreamBox(
+            this.toStream().pipeThrough(new TextDecoderStream(label)
+        ))
+    }
+
+    csv(this: StreamBox<string>) {
+        return new StreamBox(
+            this.toStream().pipeThrough(new CsvParseStream({
+                skipFirstRow: true,
+            }))
+        ).map(x =>
+            Object.fromEntries(
+                Object.entries(x).map(([k, v]) =>
+                    [k, v == "" ? undefined : v]
+                )
+            )
+        )
+    }
+
+    parseRow<T extends S>(this: StreamBox<Record<string, unknown>>, schema: T) {
+        return this.map(parseRow(schema))
+    }
 }
 
 // @deno-types="https://cdn.sheetjs.com/xlsx-0.20.3/package/types/index.d.ts"
@@ -69,7 +93,7 @@ export class Bytes extends Box<Uint8Array<ArrayBuffer>> {
         const raw = this.raw
         let offset = 0
         
-        return new BytesStream(
+        return new StreamBox(
             new ReadableStream<Uint8Array<ArrayBuffer>>({
                 pull(ctl) {
                     if (offset >= raw.byteLength) {
@@ -82,14 +106,6 @@ export class Bytes extends Box<Uint8Array<ArrayBuffer>> {
                 }
             })
         )
-    }
-}
-
-export class BytesStream extends StreamBox<Uint8Array<ArrayBuffer>> {
-    decode(label: string) {
-        return new TextStream(
-            this.toStream().pipeThrough(new TextDecoderStream(label)
-        ))
     }
 }
 
@@ -107,16 +123,6 @@ export class Text extends Box<string> {
                     )
                 )
             )
-        )
-    }
-}
-
-export class TextStream extends StreamBox<string> {
-    csv() {
-        return new TableStream(
-            this.toStream().pipeThrough(new CsvParseStream({
-                skipFirstRow: true,
-            }))
         )
     }
 }
@@ -142,11 +148,5 @@ export class Table<Row> extends Box<IteratorObject<Row>> {
     }
     map<O>(f: (row: Row, i: number) => O) {
         return new Table(this.raw.map(f))
-    }
-}
-
-export class TableStream<Row> extends StreamBox<Row> {
-    parseRow<T extends S>(schema: T) {
-        return this.map(parseRow(schema))
     }
 }

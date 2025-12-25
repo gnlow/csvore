@@ -8,27 +8,27 @@ const res = bytes(busStopsRaw)
     .chunk()
     .decode("euc-kr")
     .csv()
-    // .map(row => {
-    //     if (row.위도 && row.경도) {
-    //         if (Number(row.위도) > Number(row.경도)) {
-    //             console.log("lonLatFix(swap)", row.정류장명)
-    //             return {
-    //                 ...row,
-    //                 위도: row.경도,
-    //                 경도: row.위도,
-    //             }
-    //         }
-    //         if (row.위도 == row.경도) {
-    //             console.log("lonLatFix(naaa)", row.정류장명)
-    //             return {
-    //                 ...row,
-    //                 위도: undefined,
-    //                 경도: undefined,
-    //             }
-    //         }
-    //     }
-    //     return row
-    // })
+    .map(row => {
+        if (row.위도 && row.경도) {
+            if (Number(row.위도) > Number(row.경도)) {
+                console.log("lonLatFix(swap)", row.정류장명)
+                return {
+                    ...row,
+                    위도: row.경도,
+                    경도: row.위도,
+                }
+            }
+            if (row.위도 == row.경도) {
+                console.log("lonLatFix(naaa)", row.정류장명)
+                return {
+                    ...row,
+                    위도: undefined,
+                    경도: undefined,
+                }
+            }
+        }
+        return row
+    })
     .parseRow(z.object({
         정류장번호:     z.string(),
         정류장명:       z.string(),
@@ -41,4 +41,4 @@ const res = bytes(busStopsRaw)
         관리도시명:     z.string(),
     }))
 
-console.log((await res.take(10).toArray()))
+console.log((await res.toArray()).length)
