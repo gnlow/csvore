@@ -54,10 +54,14 @@ export class StreamBox<T> extends Box<AsyncIterable<T>> {
         ))
     }
 
-    csv(this: StreamBox<string>) {
+    csv(
+        this: StreamBox<string>,
+        option?: CsvParseStreamOptions,
+    ) {
         return new StreamBox(
             this.toStream().pipeThrough(new CsvParseStream({
                 skipFirstRow: true,
+                ...option,
             }))
         ).map(x =>
             Object.fromEntries(
@@ -109,13 +113,14 @@ export class Bytes extends Box<Uint8Array<ArrayBuffer>> {
     }
 }
 
-import { parse, CsvParseStream } from "https://esm.sh/jsr/@std/csv@1.0.6"
+import { parse, CsvParseStream, CsvParseStreamOptions } from "https://esm.sh/jsr/@std/csv@1.0.6"
 
 export class Text extends Box<string> {
-    csv() {
+    csv(option?: CsvParseStreamOptions) {
         return new Table(
             parse(this.raw, {
                 skipFirstRow: true,
+                ...option,
             }).values().map(x =>
                 Object.fromEntries(
                     Object.entries(x).map(([k, v]) =>
