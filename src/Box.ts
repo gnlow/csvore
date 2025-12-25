@@ -142,7 +142,7 @@ const parseRow =
         throw new Error("Async validator is not implemented")
     }
     if (res.issues) {
-        throw new Error(`fail on row ${i}:\n${res.issues}`)
+        throw new Error(`fail on row ${i}:\n${JSON.stringify(res.issues, undefined, 2)}`)
     }
     return res.value as S.InferOutput<T>
 }
