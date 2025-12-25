@@ -1,0 +1,20 @@
+{
+    "permissions": {
+        "default": {
+            "import": [
+                "esm.sh",
+                "cdn.jsdelivr.net",
+                "cdn.sheetjs.com"
+            ]
+        }
+    },
+    "lint": {
+        "rules": {
+            "exclude": [
+                "no-import-prefix"
+            ]
+        }
+    },
+    "unstable": ["raw-imports"],
+    "lock": false
+}
