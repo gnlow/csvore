@@ -48,7 +48,7 @@ export class StreamBox<T> extends Box<AsyncIterable<T>> {
         }
     }
 
-    decode(this: StreamBox<Uint8Array<ArrayBuffer>>, label: string) {
+    decode(this: StreamBox<Uint8Array<ArrayBuffer>>, label?: string) {
         return new StreamBox(
             this.toStream().pipeThrough(new TextDecoderStream(label)
         ))
@@ -81,7 +81,7 @@ export class StreamBox<T> extends Box<AsyncIterable<T>> {
 import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs"
 
 export class Bytes extends Box<Uint8Array<ArrayBuffer>> {
-    decode(label: string) {
+    decode(label?: string) {
         return new Text(
             new TextDecoder(label).decode(this.raw)
         )
